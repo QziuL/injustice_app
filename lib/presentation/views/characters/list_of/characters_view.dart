@@ -45,7 +45,7 @@ class _CharactersViewState extends State<CharactersView> {
   }
 
   Future<void> _deleteCharacter(Character character) async {
-    // await _viewModel.deleteCharacter(character.id);
+    await _viewModel.deleteCharacterCommand.executeWith((id: character.id));
 
     if (mounted) {
       ScaffoldMessenger.of(
@@ -162,7 +162,11 @@ class _CharactersViewState extends State<CharactersView> {
       //   ],
       // ),
       drawer: AppDrawer(),
-      body: CharactersBody(account: account, viewModel: _viewModel),
+      body: CharactersBody(
+        account: account,
+        viewModel: _viewModel,
+        onDelete: _deleteCharacter,
+      ),
       // body: Watch((context) {
       //   final isLoading =
       //       _viewModel.commands.getAllCharactersCommand.isExecuting.value;

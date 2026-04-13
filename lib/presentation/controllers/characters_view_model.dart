@@ -21,11 +21,14 @@ class CharactersViewModel {
       state: _state,
       getAccountCommand: GetAllCharactersCommand(facade),
       createCharacterCommand: CreateCharacterCommand(facade),
-     );
+      deleteCharacterCommand: DeleteCharacterCommand(facade),
+    );
   }
-   // --- Comandos expostos ---
+  // --- Comandos expostos ---
   GetAllCharactersCommand get getAllCharactersCommand =>
-      commands.getAllCharactersCommand; 
+      commands.getAllCharactersCommand;
   CreateCharacterCommand get createCharacterCommand =>
       commands.createCharacterCommand;
+  DeleteCharacterCommand get deleteCharacterCommand =>
+      commands.deleteCharacterCommand;
 }
