@@ -45,8 +45,11 @@ class AppRouter {
         path: AppPaths.characters,
         name: AppRouteNames.characters,
         pageBuilder: (context, state) {
-          final account = state.extra as Account;
-          return NoTransitionPage(child: CharactersView(account: account));
+          final account = state.extra as Account?;
+          // return NoTransitionPage(child: CharactersView(account: account));
+          return (account != null)
+              ? NoTransitionPage(child: CharactersView(account: account))
+              : const NoTransitionPage(child: HomeView());
         },
       ),
       GoRoute(
