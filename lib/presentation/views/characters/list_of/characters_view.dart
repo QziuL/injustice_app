@@ -162,61 +162,56 @@ class _CharactersViewState extends State<CharactersView> {
       //   ],
       // ),
       drawer: AppDrawer(),
-      body: CharactersBody(
-        account: account,
-        viewModel: _viewModel,
-        onDelete: _deleteCharacter,
-      ),
-      // body: Watch((context) {
-      //   final isLoading =
-      //       _viewModel.commands.getAllCharactersCommand.isExecuting.value;
+      body: Watch((context) {
+        final isLoading =
+            _viewModel.commands.getAllCharactersCommand.isExecuting.value;
 
-      //   final characters = _viewModel.charactersState.sortedCharacters.value;
+        final characters = _viewModel.charactersState.sortedCharacters.value;
 
-      //   return RefreshIndicator(
-      //     onRefresh: () async {},
-      //     child: CustomScrollView(
-      //       slivers: [
-      //         /// Header
-      //         SliverToBoxAdapter(
-      //           child: Padding(
-      //             padding: AppSpacing.paddingMd,
-      //             child: AccountSummaryCard(account: account),
-      //           ),
-      //         ),
+        return RefreshIndicator(
+          onRefresh: () async {},
+          child: CustomScrollView(
+            slivers: [
+              /// Header
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AppSpacing.paddingMd,
+                  child: AccountSummaryCard(account: account),
+                ),
+              ),
 
-      //         /// Filtros
-      //         SliverToBoxAdapter(child: FilterPanel(viewModel: _viewModel)),
+              /// Filtros
+              SliverToBoxAdapter(child: FilterPanel(viewModel: _viewModel)),
 
-      //         /// Conteúdo (loading | empty | lista)
-      //         if (isLoading)
-      //           SliverFillRemaining(
-      //             hasScrollBody: false,
-      //             child: LoadingIndicator(message: 'Carregando personagens...'),
-      //           )
-      //         else if (characters.isEmpty)
-      //           SliverFillRemaining(
-      //             hasScrollBody: false,
-      //             child: const EmptyState(),
-      //           )
-      //         else
-      //           SliverPadding(
-      //             padding: AppSpacing.paddingMd,
-      //             sliver: SliverList(
-      //               delegate: SliverChildBuilderDelegate((context, index) {
-      //                 final character = characters[index];
-      //                 return CharacterListItem(
-      //                   character: character,
-      //                   onDelete: () => _deleteCharacter(character),
-      //                   onTap: () {},
-      //                 );
-      //               }, childCount: characters.length),
-      //             ),
-      //           ),
-      //       ],
-      //     ),
-      //   );
-      // }),
+              /// Conteúdo (loading | empty | lista)
+              if (isLoading)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: LoadingIndicator(message: 'Carregando personagens...'),
+                )
+              else if (characters.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: const EmptyState(),
+                )
+              else
+                SliverPadding(
+                  padding: AppSpacing.paddingMd,
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final character = characters[index];
+                      return CharacterListItem(
+                        character: character,
+                        onDelete: () => _deleteCharacter(character),
+                        onTap: () {},
+                      );
+                    }, childCount: characters.length),
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
       floatingActionButton: CharactersFab(viewModel: _viewModel),
       // floatingActionButton: Watch((context) {
       //   final isExecuting =
@@ -245,46 +240,46 @@ class _CharactersViewState extends State<CharactersView> {
   }
 }
 
-// class EmptyState extends StatelessWidget {
-//   const EmptyState({super.key});
+class EmptyState extends StatelessWidget {
+  const EmptyState({super.key});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(
-//           horizontal: AppSpacing.xxl,
-//           vertical: AppSpacing.xxl,
-//         ),
-//         child: Column(
-//           // mainAxisSize: MainAxisSize.max,
-//           // mainAxisAlignment: MainAxisAlignment.start,
-//           children: [
-//             Icon(
-//               Icons.people_outline,
-//               size: 72,
-//               color: Theme.of(context).colorScheme.outline,
-//             ),
-//             const SizedBox(height: AppSpacing.md),
-//             Text(
-//               'Nenhum personagem encontrado',
-//               textAlign: TextAlign.center,
-//               style: context.textStyles.titleMedium?.semiBold,
-//             ),
-//             const SizedBox(height: AppSpacing.sm),
-//             Text(
-//               'Adicione seu primeiro personagem usando o botão +',
-//               textAlign: TextAlign.center,
-//               style: context.textStyles.bodyMedium?.withColor(
-//                 Theme.of(context).colorScheme.onSurfaceVariant,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xxl,
+          vertical: AppSpacing.xxl,
+        ),
+        child: Column(
+          // mainAxisSize: MainAxisSize.max,
+          // mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.people_outline,
+              size: 72,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Nenhum personagem encontrado',
+              textAlign: TextAlign.center,
+              style: context.textStyles.titleMedium?.semiBold,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Adicione seu primeiro personagem usando o botão +',
+              textAlign: TextAlign.center,
+              style: context.textStyles.bodyMedium?.withColor(
+                Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 // /// Item da lista de personagens
 // class CharacterListItem extends StatelessWidget {
