@@ -81,6 +81,7 @@ class _HomeViewState extends State<HomeView> {
                   onPressed: () {
                     Navigator.pop(ctx);
                   },
+                  style: TextButton.styleFrom(foregroundColor: Colors.white),
                   child: const Text('Não'),
                 ),
                 TextButton(
@@ -88,6 +89,7 @@ class _HomeViewState extends State<HomeView> {
                     Navigator.pop(ctx);
                     context.goNamed(AppRouteNames.characters, extra: account);
                   },
+                  style: TextButton.styleFrom(foregroundColor: Colors.white),
                   child: const Text('Sim'),
                 ),
               ],
