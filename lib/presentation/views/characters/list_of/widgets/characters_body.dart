@@ -180,7 +180,12 @@ class CharacterListItem extends StatelessWidget {
         }
       },
       child: Card(
-        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.9),
+        color: character.rarity.color.withValues(alpha: 0.1),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          side: BorderSide(color: character.rarity.color, width: 1),
+        ),
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         child: InkWell(
           onTap: onTap,
@@ -189,58 +194,92 @@ class CharacterListItem extends StatelessWidget {
             padding: AppSpacing.paddingMd,
             child: Row(
               children: [
-                // Indicador de raridade
+                // Indicador de Raridade e Classe
                 Container(
-                  width: 4,
-                  height: 60,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
-                    color: character.rarity.color,
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    color: character.characterClass.color.withValues(
+                      alpha: 0.2,
+                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: character.characterClass.color,
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    character.characterClass.icon,
+                    color: character.characterClass.color,
+                    size: 28,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
-                // Conteúdo principal
+                // Conteúdo Principal
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Text(
                               character.name,
-                              style: context.textStyles.titleMedium?.semiBold,
+                              style: context.textStyles.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: character.rarity.color,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            'Nv. ${character.level}',
-                            style: context.textStyles.labelLarge?.withColor(
-                              Theme.of(context).colorScheme.onSecondary,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Row(
-                        children: [
-                          Icon(
-                            character.characterClass.icon,
-                            size: 16,
-                            color: character.characterClass.color,
-                          ),
-                          const SizedBox(width: AppSpacing.xs),
-                          Text(
-                            character.characterClass.displayName,
-                            style: context.textStyles.bodySmall?.withColor(
-                              Theme.of(context).colorScheme.onSurfaceVariant,
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Nv. ${character.level}',
+                              style: context.textStyles.labelMedium?.withColor(
+                                Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
+                              ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       StarRating(stars: character.stars, size: 14),
+                      const SizedBox(height: AppSpacing.sm),
+                      // Mini atributos
+                      Row(
+                        children: [
+                          _buildMiniStat(
+                            Icons.warning_amber_rounded,
+                            Colors.orange,
+                            character.threat.toString(),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          _buildMiniStat(
+                            Icons.sports_mma,
+                            Colors.red,
+                            character.attack.toString(),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          _buildMiniStat(
+                            Icons.favorite,
+                            Colors.green,
+                            character.health.toString(),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -249,6 +288,23 @@ class CharacterListItem extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMiniStat(IconData icon, Color color, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 }

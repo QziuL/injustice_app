@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injustice_app/core/di/dependency_injection.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/models/character_entity.dart';
+import '../../../../domain/models/extensions/character_ui.dart';
 import '../../../controllers/characters_view_model.dart';
 
 class CharacterCreateView extends StatefulWidget {
@@ -90,185 +92,347 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.character != null;
+    final primaryColor = isEditing
+        ? _selectedRarity.color
+        : Theme.of(context).colorScheme.primary;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.character != null ? 'Edit Character' : 'New Character',
+          isEditing ? 'Editar Personagem' : 'Novo Personagem',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
+        backgroundColor: primaryColor.withValues(alpha: 0.1),
         actions: [
           IconButton(icon: const Icon(Icons.check), onPressed: _saveCharacter),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: AppSpacing.paddingLg,
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Name is required';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<CharacterClass>(
-                value: _selectedClass,
-                decoration: const InputDecoration(labelText: 'Class'),
-                items: CharacterClass.values
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e.displayName),
+              // Nome e Nível
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  side: BorderSide(color: primaryColor, width: 2),
+                ),
+                child: Padding(
+                  padding: AppSpacing.paddingLg,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        style: context.textStyles.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          labelText: 'Nome do Personagem',
+                          labelStyle: context.textStyles.titleMedium,
+                          border: InputBorder.none,
+                          alignLabelWithHint: true,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'O nome é obrigatório';
+                          }
+                          return null;
+                        },
                       ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedClass = value;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<CharacterRarity>(
-                value: _selectedRarity,
-                decoration: const InputDecoration(labelText: 'Rarity'),
-                items: CharacterRarity.values
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e.displayName),
+                      const Divider(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _levelController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nível',
+                                icon: Icon(Icons.upgrade),
+                                border: InputBorder.none,
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty)
+                                  return 'Requerido';
+                                final num = int.tryParse(value);
+                                if (num == null || num < 1 || num > 80)
+                                  return '1-80';
+                                return null;
+                              },
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 40,
+                            color: Colors.grey.withValues(alpha: 0.3),
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _starsController,
+                              decoration: const InputDecoration(
+                                labelText: 'Estrelas',
+                                icon: Icon(Icons.star, color: Colors.amber),
+                                border: InputBorder.none,
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty)
+                                  return 'Requerido';
+                                final num = int.tryParse(value);
+                                if (num == null || num < 1 || num > 14)
+                                  return '1-14';
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedRarity = value;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<CharacterAlignment>(
-                value: _selectedAlignment,
-                decoration: const InputDecoration(labelText: 'Alignment'),
-                items: CharacterAlignment.values
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e.displayName),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedAlignment = value;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _levelController,
-                      decoration: const InputDecoration(labelText: 'Level'),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        final num = int.tryParse(value);
-                        if (num == null || num < 1 || num > 80) {
-                          return '1-80';
-                        }
-                        return null;
-                      },
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _starsController,
-                      decoration: const InputDecoration(labelText: 'Stars'),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        final num = int.tryParse(value);
-                        if (num == null || num < 1 || num > 14) {
-                          return '1-14';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _threatController,
-                      decoration: const InputDecoration(labelText: 'Threat'),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        if (int.tryParse(value) == null) return 'Invalid';
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _attackController,
-                      decoration: const InputDecoration(labelText: 'Attack'),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        if (int.tryParse(value) == null) return 'Invalid';
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _healthController,
-                      decoration: const InputDecoration(labelText: 'Health'),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Required';
-                        if (int.tryParse(value) == null) return 'Invalid';
-                        return null;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _saveCharacter,
-                child: Text(
-                  widget.character != null
-                      ? 'Save Changes'
-                      : 'Create Character',
                 ),
               ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Classificações
+              Text(
+                'Classificação',
+                style: context.textStyles.titleLarge?.semiBold,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                ),
+                child: Padding(
+                  padding: AppSpacing.paddingLg,
+                  child: Column(
+                    children: [
+                      DropdownButtonFormField<CharacterClass>(
+                        value: _selectedClass,
+                        decoration: InputDecoration(
+                          labelText: 'Classe',
+                          icon: Icon(
+                            _selectedClass.icon,
+                            color: _selectedClass.color,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        items: CharacterClass.values
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e.displayName),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null)
+                            setState(() => _selectedClass = value);
+                        },
+                      ),
+                      const Divider(),
+                      DropdownButtonFormField<CharacterRarity>(
+                        value: _selectedRarity,
+                        decoration: InputDecoration(
+                          labelText: 'Raridade',
+                          icon: Icon(
+                            Icons.diamond,
+                            color: _selectedRarity.color,
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        items: CharacterRarity.values
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e.displayName),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null)
+                            setState(() => _selectedRarity = value);
+                        },
+                      ),
+                      const Divider(),
+                      DropdownButtonFormField<CharacterAlignment>(
+                        value: _selectedAlignment,
+                        decoration: const InputDecoration(
+                          labelText: 'Alinhamento',
+                          icon: Icon(Icons.balance),
+                          border: InputBorder.none,
+                        ),
+                        items: CharacterAlignment.values
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e.displayName),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null)
+                            setState(() => _selectedAlignment = value);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Atributos de Combate
+              Text(
+                'Atributos de Combate',
+                style: context.textStyles.titleLarge?.semiBold,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      color: Colors.orange.withValues(alpha: 0.1),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        side: const BorderSide(color: Colors.orange, width: 1),
+                      ),
+                      child: Padding(
+                        padding: AppSpacing.paddingSm,
+                        child: TextFormField(
+                          controller: _threatController,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Ameaça',
+                            alignLabelWithHint: true,
+                            prefixIcon: Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.orange,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (value) =>
+                              value == null || value.isEmpty ? '?' : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        side: const BorderSide(color: Colors.red, width: 1),
+                      ),
+                      child: Padding(
+                        padding: AppSpacing.paddingSm,
+                        child: TextFormField(
+                          controller: _attackController,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Ataque',
+                            alignLabelWithHint: true,
+                            prefixIcon: Icon(
+                              Icons.sports_mma,
+                              color: Colors.red,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (value) =>
+                              value == null || value.isEmpty ? '?' : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Card(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        side: const BorderSide(color: Colors.green, width: 1),
+                      ),
+                      child: Padding(
+                        padding: AppSpacing.paddingSm,
+                        child: TextFormField(
+                          controller: _healthController,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Vida',
+                            alignLabelWithHint: true,
+                            prefixIcon: Icon(
+                              Icons.favorite,
+                              color: Colors.green,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (value) =>
+                              value == null || value.isEmpty ? '?' : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+              FilledButton.icon(
+                onPressed: _saveCharacter,
+                icon: const Icon(Icons.save),
+                label: Text(
+                  isEditing ? 'Salvar Alterações' : 'Criar Personagem',
+                ),
+                style: FilledButton.styleFrom(
+                  padding: AppSpacing.paddingLg,
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
             ],
           ),
         ),
