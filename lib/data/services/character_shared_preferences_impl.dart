@@ -82,7 +82,15 @@ final class CharacterSharedPreferencesService
 
       return await currentResult.fold(
         onSuccess: (characters) async {
-          final updatedCharacters = [...characters, character];
+          final index = characters.indexWhere((c) => c.id == character.id);
+          final updatedCharacters = List<Character>.from(characters);
+          
+          if (index != -1) {
+            updatedCharacters[index] = character;
+          } else {
+            updatedCharacters.add(character);
+          }
+          
           await _saveCharacters(updatedCharacters);
           return Success(character);
         },
