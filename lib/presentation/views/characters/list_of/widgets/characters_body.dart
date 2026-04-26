@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../domain/models/account_entity.dart';
 import '../../../../../domain/models/character_entity.dart';
@@ -64,7 +66,12 @@ class CharactersBody extends StatelessWidget {
                     return CharacterListItem(
                       character: character,
                       onDelete: () {},
-                      onTap: () {},
+                      onTap: () {
+                        context.pushNamed(
+                          AppRouteNames.characterDetails,
+                          extra: character,
+                        );
+                      },
                     );
                   }, childCount: characters.length),
                 ),
@@ -134,17 +141,8 @@ class CharacterListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key(character.id),
+      direction: DismissDirection.endToStart,
       background: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-        ),
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.only(left: AppSpacing.lg),
-        child: const Icon(Icons.edit, color: Colors.white),
-      ),
-      secondaryBackground: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         decoration: BoxDecoration(
           color: Colors.red,
@@ -155,35 +153,26 @@ class CharacterListItem extends StatelessWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          onTap();
-          return false;
-        } else {
-          return await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Confirmar exclusão'),
-                  content: Text('Deseja realmente excluir ${character.name}?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text('Cancelar'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text('Excluir'),
-                    ),
-                  ],
-                ),
-              ) ??
-              false;
-        }
+        return await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Confirmar exclusão'),
+                content: Text('Deseja realmente excluir ${character.name}?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(foregroundColor: Colors.white),
+                    child: const Text('Cancelar'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: TextButton.styleFrom(foregroundColor: Colors.white),
+                    child: const Text('Excluir'),
+                  ),
+                ],
+              ),
+            ) ??
+            false;
       },
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {

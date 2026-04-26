@@ -87,11 +87,18 @@ class CharactersCommandsViewModel {
       _createCharacterCommand,
       onSuccess: (newCharacter) {
         final currentList = state.state.value;
-        final newlist = [
-          ...currentList,
-          newCharacter,
-        ]; // Adiciona o novo personagem à lista
-        state.state.value = newlist;
+        final index = currentList.indexWhere((c) => c.id == newCharacter.id);
+
+        if (index != -1) {
+          // Atualiza o personagem existente
+          final newList = List<Character>.from(currentList);
+          newList[index] = newCharacter;
+          state.state.value = newList;
+        } else {
+          // Adiciona o novo personagem à lista
+          final newList = [...currentList, newCharacter];
+          state.state.value = newList;
+        }
       },
       onFailure: (err) =>
           state.setMessage(err.msg), // registra o erro no estado

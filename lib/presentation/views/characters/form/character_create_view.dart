@@ -7,7 +7,9 @@ import '../../../../domain/models/character_entity.dart';
 import '../../../controllers/characters_view_model.dart';
 
 class CharacterCreateView extends StatefulWidget {
-  const CharacterCreateView({super.key});
+  final Character? character;
+
+  const CharacterCreateView({super.key, this.character});
 
   @override
   State<CharacterCreateView> createState() => _CharacterCreateViewState();
@@ -32,6 +34,20 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
   void initState() {
     super.initState();
     _viewModel = injector.get<CharactersViewModel>();
+
+    if (widget.character != null) {
+      final c = widget.character!;
+      _nameController.text = c.name;
+      _levelController.text = c.level.toString();
+      _threatController.text = c.threat.toString();
+      _attackController.text = c.attack.toString();
+      _healthController.text = c.health.toString();
+      _starsController.text = c.stars.toString();
+
+      _selectedClass = c.characterClass;
+      _selectedRarity = c.rarity;
+      _selectedAlignment = c.alignment;
+    }
   }
 
   @override
@@ -48,8 +64,12 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
   void _saveCharacter() {
     if (_formKey.currentState!.validate()) {
       final now = DateTime.now();
+      final isEditing = widget.character != null;
+
       final newCharacter = Character(
-        id: now.millisecondsSinceEpoch.toString(),
+        id: isEditing
+            ? widget.character!.id
+            : now.millisecondsSinceEpoch.toString(),
         name: _nameController.text,
         characterClass: _selectedClass,
         rarity: _selectedRarity,
@@ -59,7 +79,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
         health: int.parse(_healthController.text),
         stars: int.parse(_starsController.text),
         alignment: _selectedAlignment,
-        createdAt: now,
+        createdAt: isEditing ? widget.character!.createdAt : now,
         updatedAt: now,
       );
 
@@ -72,7 +92,9 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Character'),
+        title: Text(
+          widget.character != null ? 'Edit Character' : 'New Character',
+        ),
         actions: [
           IconButton(icon: const Icon(Icons.check), onPressed: _saveCharacter),
         ],
@@ -241,7 +263,11 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _saveCharacter,
-                child: const Text('Create Character'),
+                child: Text(
+                  widget.character != null
+                      ? 'Save Changes'
+                      : 'Create Character',
+                ),
               ),
             ],
           ),
