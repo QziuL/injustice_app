@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:injustice_app/core/routes/app_routes.dart';
 import 'widgets/characters_app_bar.dart';
 import 'widgets/characters_body.dart';
 import 'widgets/characters_floating_button.dart';
@@ -203,7 +205,12 @@ class _CharactersViewState extends State<CharactersView> {
                       return CharacterListItem(
                         character: character,
                         onDelete: () => _deleteCharacter(character),
-                        onTap: () {},
+                        onTap: () {
+                          context.pushNamed(
+                            AppRouteNames.characterDetails,
+                            extra: character,
+                          );
+                        },
                       );
                     }, childCount: characters.length),
                   ),
