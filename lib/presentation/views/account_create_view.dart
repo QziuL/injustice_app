@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/di/dependency_injection.dart';
-import '../../core/failure/failure.dart';
-import '../../core/messages/app_messages.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/typedefs/types_defs.dart';
 import '../../core/validators/email_str_validator.dart';
 import '../../core/validators/empty_str_validator.dart';
-import '../../core/validators/text_field_validator.dart';
 import '../../domain/models/account_entity.dart';
 import '../controllers/account_state_viewmodel.dart';
 import '../controllers/account_viewmodel.dart';
@@ -26,7 +23,6 @@ class AccountCreateView extends StatefulWidget {
 }
 
 class _AccountCreateViewState extends State<AccountCreateView> {
-  // late final CriarContaViewModel _viewModel;
   late final AccountViewModel _vmAccount;
   late final void Function() _disposeAccountEffect;
   late final void Function() _disposeSuccessEffect;
@@ -34,11 +30,6 @@ class _AccountCreateViewState extends State<AccountCreateView> {
 
   final _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
-
-  // late final FormFieldControl _emailField;
-  // late final FormFieldControl _nomeField;
-  // late final FormFieldControl _displayNameField;
-  // late final List<FormFieldControl> _fields;
   late final AccountFormFieldsController _formFields;
 
   DateTime _createdAt = DateTime.now();
@@ -51,27 +42,6 @@ class _AccountCreateViewState extends State<AccountCreateView> {
   void initState() {
     super.initState();
     _formFields = AccountFormFieldsController();
-
-    // _emailField = (
-    //   key: GlobalKey<FormFieldState>(),
-    //   focus: FocusNode(),
-    //   controller: TextEditingController(),
-    // );
-
-    // _nomeField = (
-    //   key: GlobalKey<FormFieldState>(),
-    //   focus: FocusNode(),
-    //   controller: TextEditingController(),
-    // );
-
-    // _displayNameField = (
-    //   key: GlobalKey<FormFieldState>(),
-    //   focus: FocusNode(),
-    //   controller: TextEditingController(),
-    // );
-
-    // _fields = [_emailField, _nomeField, _displayNameField];
-
     _vmAccount = injector.get<AccountViewModel>();
     _vmAccount.accountState.clearMessage();
     _vmAccount.accountState.clearSuccessEvent();
@@ -92,12 +62,7 @@ class _AccountCreateViewState extends State<AccountCreateView> {
       if (errorMessage != null && mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
-          // );
           showSnackBar(context, errorMessage, backgroundColor: Colors.red);
-
           _vmAccount.accountState.clearMessage();
         });
       }
@@ -144,10 +109,6 @@ class _AccountCreateViewState extends State<AccountCreateView> {
     _scrollController.dispose();
 
     _formFields.dispose();
-    // for (final field in _fields) {
-    //   field.focus.dispose();
-    //   field.controller.dispose();
-    // }
     super.dispose();
   }
 
@@ -178,12 +139,6 @@ class _AccountCreateViewState extends State<AccountCreateView> {
 
     setState(() {});
   }
-
-  // void _clearForm() {
-  //   for (final field in _fields) {
-  //     field.controller.clear();
-  //   }
-  // }
 
   void _resetFormView() {
     // Remove foco de qualquer TextField
