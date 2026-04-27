@@ -93,9 +93,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.character != null;
-    final primaryColor = isEditing
-        ? _selectedRarity.color
-        : Theme.of(context).colorScheme.primary;
+    final primaryColor = _selectedRarity.color;
 
     return Scaffold(
       appBar: AppBar(
